@@ -99,11 +99,12 @@ func (h *MessageHandler) handleUnknownCommand(command string) string {
 		command, h.config.CommandPrefix)
 }
 
-// LogMessage logs an incoming message
+// LogMessage logs an incoming message with phone number masking for privacy
 func (h *MessageHandler) LogMessage(msg *Message) {
+	maskedSender := maskPhoneNumber(msg.Sender)
 	if msg.GroupID != "" {
-		log.Printf("[Group: %s] %s: %s", msg.GroupID, msg.Sender, msg.Text)
+		log.Printf("[Group: %s] %s: %s", msg.GroupID, maskedSender, msg.Text)
 	} else {
-		log.Printf("[Direct] %s: %s", msg.Sender, msg.Text)
+		log.Printf("[Direct] %s: %s", maskedSender, msg.Text)
 	}
 }
