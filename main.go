@@ -45,7 +45,7 @@ func main() {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
-	log.Printf("Bot configured for number: %s", config.PhoneNumber)
+	log.Printf("Bot configured for number: %s", maskPhoneNumber(config.PhoneNumber))
 	log.Printf("Command prefix: %s", config.CommandPrefix)
 
 	// Create message handler
@@ -151,6 +151,10 @@ func sendMessage(config *Config, originalMsg *Message, text string) error {
 	var cmd *exec.Cmd
 
 	if originalMsg.GroupID != "" {
+		// Validate group ID (should be base64-like string)
+		if !isValidIdentifier(originalMsg.GroupID) {
+			return fmt.Errorf("invalid group ID format")
+		}
 		// Send to group
 		cmd = exec.Command("signal-cli",
 			"-a", config.PhoneNumber,
@@ -160,6 +164,10 @@ func sendMessage(config *Config, originalMsg *Message, text string) error {
 			"-m", text,
 		)
 	} else {
+		// Validate sender phone number
+		if !isValidPhoneNumber(originalMsg.Sender) {
+			return fmt.Errorf("invalid sender phone number format")
+		}
 		// Send direct message
 		cmd = exec.Command("signal-cli",
 			"-a", config.PhoneNumber,
@@ -179,4 +187,44 @@ func sendMessage(config *Config, originalMsg *Message, text string) error {
 	}
 
 	return nil
+}
+
+// isValidPhoneNumber validates that a phone number is in expected format
+func isValidPhoneNumber(phone string) bool {
+	if len(phone) < 8 || len(phone) > 20 {
+		return false
+	}
+	// Must start with + and contain only digits
+	if phone[0] != '+' {
+		return false
+	}
+	for _, c := range phone[1:] {
+		if c < '0' || c > '9' {
+			return false
+		}
+	}
+	return true
+}
+
+// isValidIdentifier validates identifiers (group IDs, UUIDs, etc.)
+func isValidIdentifier(id string) bool {
+	if len(id) == 0 || len(id) > 100 {
+		return false
+	}
+	// Allow alphanumeric, dash, underscore, equals (base64)
+	for _, c := range id {
+		if !((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
+			(c >= '0' && c <= '9') || c == '-' || c == '_' || c == '=' || c == '+' || c == '/') {
+			return false
+		}
+	}
+	return true
+}
+
+// maskPhoneNumber masks a phone number for logging (shows only last 4 digits)
+func maskPhoneNumber(phone string) string {
+	if len(phone) <= 4 {
+		return "****"
+	}
+	return "****" + phone[len(phone)-4:]
 }

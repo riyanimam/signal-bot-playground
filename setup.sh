@@ -42,8 +42,9 @@ if [[ ! $phone_number =~ ^\+[0-9]{10,15}$ ]]; then
     exit 1
 fi
 
-# Update .env file
-sed -i.bak "s/SIGNAL_PHONE_NUMBER=/SIGNAL_PHONE_NUMBER=$phone_number/" .env
+# Update .env file using printf to safely escape the value
+phone_number_escaped=$(printf '%s\n' "$phone_number" | sed -e 's/[\/&]/\\&/g')
+sed -i.bak "s/SIGNAL_PHONE_NUMBER=/SIGNAL_PHONE_NUMBER=$phone_number_escaped/" .env
 rm .env.bak 2>/dev/null || true
 
 echo -e "${GREEN}✓ Configuration saved to .env${NC}"
@@ -53,7 +54,8 @@ echo ""
 echo "What command prefix would you like to use? (default: !)"
 read -p "Prefix: " prefix
 if [ ! -z "$prefix" ]; then
-    sed -i.bak "s/BOT_COMMAND_PREFIX=!/BOT_COMMAND_PREFIX=$prefix/" .env
+    prefix_escaped=$(printf '%s\n' "$prefix" | sed -e 's/[\/&]/\\&/g')
+    sed -i.bak "s/BOT_COMMAND_PREFIX=!/BOT_COMMAND_PREFIX=$prefix_escaped/" .env
     rm .env.bak 2>/dev/null || true
 fi
 
