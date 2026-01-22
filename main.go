@@ -79,8 +79,13 @@ func main() {
 
 	go func() {
 		<-sigChan
-		log.Println("\nShutting down bot...")
+		log.Println("\nShutting down bot gracefully...")
 		if cmd.Process != nil {
+			// Try graceful shutdown first
+			cmd.Process.Signal(os.Interrupt)
+			// Wait a bit for graceful shutdown
+			time.Sleep(2 * time.Second)
+			// Force kill if still running
 			cmd.Process.Kill()
 		}
 		os.Exit(0)

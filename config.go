@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -31,7 +32,7 @@ func LoadConfig() (*Config, error) {
 
 	// Validate required fields
 	if config.PhoneNumber == "" {
-		log.Fatal("SIGNAL_PHONE_NUMBER is required")
+		return nil, fmt.Errorf("SIGNAL_PHONE_NUMBER is required")
 	}
 
 	return config, nil

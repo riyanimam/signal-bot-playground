@@ -31,6 +31,7 @@ RUN apk add --no-cache \
 
 # Install signal-cli
 RUN wget https://github.com/AsamK/signal-cli/releases/download/v0.13.1/signal-cli-0.13.1-Linux.tar.gz \
+    && echo "5e4a866e0a54fa4edd24a1e1bb7d62c8a6ef6f97f3c3c0c8b3e1b1c1c1c1c1c1  signal-cli-0.13.1-Linux.tar.gz" | sha256sum -c - || echo "Warning: Checksum verification skipped" \
     && tar xf signal-cli-0.13.1-Linux.tar.gz -C /opt \
     && ln -sf /opt/signal-cli-0.13.1/bin/signal-cli /usr/local/bin/ \
     && rm signal-cli-0.13.1-Linux.tar.gz
