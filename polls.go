@@ -17,6 +17,7 @@ type Poll struct {
 	GroupID   string
 	CreatedAt time.Time
 	Duration  time.Duration
+	Closed    bool // Explicitly tracks if poll is closed
 }
 
 // PollManager manages active polls
@@ -72,8 +73,14 @@ func (pm *PollManager) Vote(pollID, voter, option string) error {
 		return fmt.Errorf("poll not found")
 	}
 
-	// Check if poll is still active
+	// Check if poll is closed
+	if poll.Closed {
+		return fmt.Errorf("poll has closed")
+	}
+
+	// Check if poll is still active (if duration was set)
 	if poll.Duration > 0 && time.Since(poll.CreatedAt) > poll.Duration {
+		poll.Closed = true
 		return fmt.Errorf("poll has closed")
 	}
 
@@ -132,7 +139,9 @@ func (pm *PollManager) GetPollResults(pollID string) (string, error) {
 
 	result += fmt.Sprintf("Total votes: %d", totalVotes)
 
-	if poll.Duration > 0 {
+	if poll.Closed {
+		result += "\n🔒 Poll closed"
+	} else if poll.Duration > 0 {
 		timeLeft := poll.Duration - time.Since(poll.CreatedAt)
 		if timeLeft > 0 {
 			result += fmt.Sprintf("\nTime left: %s", timeLeft.Round(time.Minute))
@@ -152,7 +161,13 @@ func (pm *PollManager) ListActivePolls(groupID string) []string {
 	var polls []string
 	for _, poll := range pm.polls {
 		if poll.GroupID == groupID {
-			if poll.Duration == 0 || time.Since(poll.CreatedAt) <= poll.Duration {
+			// Check if poll is still active
+			isActive := !poll.Closed
+			if poll.Duration > 0 && time.Since(poll.CreatedAt) > poll.Duration {
+				isActive = false
+			}
+			
+			if isActive {
 				polls = append(polls, fmt.Sprintf("%s: %s", poll.ID, poll.Question))
 			}
 		}
@@ -171,8 +186,8 @@ func (pm *PollManager) ClosePoll(pollID string) error {
 		return fmt.Errorf("poll not found")
 	}
 
-	// Set duration to expired
-	poll.Duration = 0
+	// Mark poll as closed
+	poll.Closed = true
 
 	return nil
 }

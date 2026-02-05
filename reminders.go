@@ -68,7 +68,10 @@ func (rm *ReminderManager) checkReminders() {
 				// Send reminder
 				message := fmt.Sprintf("⏰ Reminder: %s", reminder.Message)
 				if rm.sendFunc != nil {
-					_ = rm.sendFunc(reminder.GroupID, reminder.Recipient, message)
+					if err := rm.sendFunc(reminder.GroupID, reminder.Recipient, message); err != nil {
+						// Log error but continue processing other reminders
+						fmt.Printf("Failed to send reminder %s: %v\n", id, err)
+					}
 				}
 
 				// Handle recurring reminders

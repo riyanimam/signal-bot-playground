@@ -191,6 +191,7 @@ func (mt *MentionTracker) ClearMentions(recipient string) {
 
 // ParseMentions extracts phone number mentions from a message
 // Looks for patterns like @+1234567890
+// Uses isValidPhoneNumber utility function from main.go
 func ParseMentions(message string) []string {
 	var mentions []string
 	parts := strings.Fields(message)

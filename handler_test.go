@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 	"sync"
 	"testing"
@@ -108,7 +109,7 @@ func TestAnnouncementManager(t *testing.T) {
 
 	// Test max announcements
 	for i := 0; i < 10; i++ {
-		am.AddAnnouncement("Message "+string(rune(i)), "+1234567890", "group123")
+		am.AddAnnouncement(fmt.Sprintf("Message %d", i), "+1234567890", "group123")
 	}
 
 	// Should only have maxPerGroup announcements

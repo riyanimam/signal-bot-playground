@@ -13,7 +13,6 @@ type GroupStats struct {
 	MessageCounts   map[string]int // sender -> count
 	LastActivity    map[string]time.Time
 	TotalMessages   int
-	ActiveToday     int
 	CreatedAt       time.Time
 }
 
@@ -54,17 +53,7 @@ func (sm *StatsManager) RecordMessage(groupID, sender string) {
 	stats.LastActivity[sender] = time.Now()
 	stats.TotalMessages++
 
-	// Check if message is from today
-	if time.Since(stats.LastActivity[sender]) < 24*time.Hour {
-		// Recalculate active today
-		stats.ActiveToday = 0
-		today := time.Now().Truncate(24 * time.Hour)
-		for _, lastSeen := range stats.LastActivity {
-			if lastSeen.After(today) {
-				stats.ActiveToday++
-			}
-		}
-	}
+	// No need to recalculate ActiveToday here, it will be calculated when queried
 }
 
 // GetGroupStats returns statistics for a group
@@ -75,6 +64,15 @@ func (sm *StatsManager) GetGroupStats(groupID string) string {
 	stats, exists := sm.stats[groupID]
 	if !exists {
 		return "No statistics available for this group yet."
+	}
+
+	// Calculate active today
+	activeToday := 0
+	today := time.Now().Truncate(24 * time.Hour)
+	for _, lastSeen := range stats.LastActivity {
+		if lastSeen.After(today) {
+			activeToday++
+		}
 	}
 
 	// Sort users by message count
@@ -94,7 +92,7 @@ func (sm *StatsManager) GetGroupStats(groupID string) string {
 
 	result := fmt.Sprintf("📊 Group Statistics\n\n")
 	result += fmt.Sprintf("Total messages: %d\n", stats.TotalMessages)
-	result += fmt.Sprintf("Active members today: %d\n", stats.ActiveToday)
+	result += fmt.Sprintf("Active members today: %d\n", activeToday)
 	result += fmt.Sprintf("Total members: %d\n\n", len(stats.MessageCounts))
 	
 	result += "Top contributors:\n"
