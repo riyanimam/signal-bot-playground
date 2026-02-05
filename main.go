@@ -48,8 +48,17 @@ func main() {
 	log.Printf("Bot configured for number: %s", maskPhoneNumber(config.PhoneNumber))
 	log.Printf("Command prefix: %s", config.CommandPrefix)
 
+	// Create send function for reminders
+	sendFunc := func(groupID, recipient, message string) error {
+		msg := &Message{
+			Sender:  recipient,
+			GroupID: groupID,
+		}
+		return sendMessage(config, msg, message)
+	}
+
 	// Create message handler
-	handler := NewMessageHandler(config)
+	handler := NewMessageHandler(config, sendFunc)
 
 	// Create signal-cli command to receive messages in JSON mode
 	cmd := exec.Command("signal-cli",

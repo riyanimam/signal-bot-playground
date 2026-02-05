@@ -175,6 +175,66 @@ type SignalMessage struct {
 }
 ```
 
+### Poll (Polls Feature)
+```go
+type Poll struct {
+    ID        string              // Unique poll identifier
+    Question  string              // Poll question
+    Options   []string            // Available options
+    Votes     map[string]string   // voter -> option
+    Creator   string              // Poll creator
+    GroupID   string              // Group where poll was created
+    CreatedAt time.Time           // Creation timestamp
+    Duration  time.Duration       // Poll duration (0 = no expiry)
+}
+```
+
+### Reminder (Reminders Feature)
+```go
+type Reminder struct {
+    ID        string          // Unique reminder identifier
+    Message   string          // Reminder message
+    Recipient string          // Who to remind
+    GroupID   string          // Group context
+    DueTime   time.Time       // When to deliver
+    Recurring bool            // Whether it repeats
+    Interval  time.Duration   // Repeat interval
+}
+```
+
+### GroupStats (Statistics Feature)
+```go
+type GroupStats struct {
+    GroupID       string                  // Group identifier
+    MessageCounts map[string]int          // sender -> count
+    LastActivity  map[string]time.Time    // sender -> timestamp
+    TotalMessages int                     // Total message count
+    ActiveToday   int                     // Members active today
+    CreatedAt     time.Time               // Tracking start time
+}
+```
+
+### Announcement (Announcements Feature)
+```go
+type Announcement struct {
+    ID        string      // Unique announcement identifier
+    Message   string      // Announcement text
+    Creator   string      // Who created it
+    GroupID   string      // Group where announced
+    CreatedAt time.Time   // Creation timestamp
+}
+```
+
+### Mention (Mentions Tracking)
+```go
+type Mention struct {
+    Sender    string      // Who mentioned you
+    Message   string      // Full message text
+    GroupID   string      // Where you were mentioned
+    Timestamp time.Time   // When you were mentioned
+}
+```
+
 ## Extension Points
 
 ### Adding New Commands
@@ -263,15 +323,26 @@ Use `LOG_LEVEL` environment variable to control verbosity:
 
 ## Future Enhancements
 
-Potential improvements:
+### Implemented Features (v1.1)
+✅ **Polls & Voting** - Democratic decision-making for large groups
+✅ **Group Statistics** - Activity tracking and engagement metrics
+✅ **Announcements** - Pinned messages for important info
+✅ **@Mentions** - Slack-style user mentions and tracking
+✅ **Reminders** - Personal task and event reminders
+
+### Potential Improvements
 - Database integration for persistent state
 - Web dashboard for monitoring
 - Plugin system for extensions
 - Multi-language support
 - Rich media handling (images, files)
 - Advanced message formatting
-- Group management commands
-- Admin authentication
+- Thread simulation for organized discussions
+- Admin authentication and roles
+- Scheduled announcements
+- Poll expiration times
+- Reaction tracking
+- Message search functionality
 
 ---
 
