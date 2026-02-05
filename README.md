@@ -10,6 +10,36 @@ A simple Signal messenger bot written in Go. This bot can respond to commands in
 - ✅ Docker support for easy deployment
 - ✅ Environment-based configuration
 
+### 🎯 Large Group Management Features (50-700+ people)
+
+- ✅ **Polls & Voting** - Create polls for group decisions with real-time results
+- ✅ **Group Statistics** - Track message counts, active members, and top contributors
+- ✅ **Announcements** - Pin important messages that everyone can reference
+- ✅ **Activity Tracking** - Monitor user engagement and participation
+
+### 🚀 Slack-Like Features
+
+- ✅ **@Mentions** - Mention users with @+phonenumber and track mentions
+- ✅ **Reminders** - Set personal reminders that the bot will deliver
+- ✅ **User Stats** - View your own activity and contribution to groups
+- ✅ **Pinned Messages** - Important announcements stay visible
+
+## Why These Features Matter for Large Groups
+
+Managing Signal groups with 50-700+ members can be challenging. These features address common pain points:
+
+**Decision Making**: In large groups, making decisions can be chaotic. Polls provide a structured way for everyone to vote and see results.
+
+**Information Overload**: Important messages get lost in active chats. Announcements keep critical info pinned and accessible.
+
+**Engagement Tracking**: See who's active and contributing. Stats help identify engaged members and understand group dynamics.
+
+**Coordination**: Reminders help members stay on track with group activities and deadlines.
+
+**Communication**: @Mentions ensure important messages reach the right people, even in busy groups.
+
+> 📖 **For detailed feature documentation and use cases, see [FEATURES.md](FEATURES.md)**
+
 ## Prerequisites
 
 Before you can run this bot, you need:
@@ -127,11 +157,122 @@ To get your Signal bot running, you need to:
 
 Once the bot is running, you can message it on Signal. The bot responds to these commands:
 
+### Basic Commands
 - `!help` - Show available commands
 - `!ping` - Check if bot is alive
 - `!echo <text>` - Echo back your message
 - `!about` - Get information about the bot
 
+### Polls & Voting (Perfect for Large Groups)
+- `!poll <question> | <option1> | <option2> | ...` - Create a poll for group decisions
+- `!vote <poll_id> <option>` - Vote in an active poll
+- `!pollresults <poll_id>` - View current poll results with percentages
+- `!polls` - List all active polls in the group
+
+**Example:**
+```
+You: !poll Where should we meet? | Coffee Shop | Restaurant | Park
+Bot: 📊 Poll created! ID: poll_1234567890
+
+Where should we meet?
+
+Options:
+1. Coffee Shop
+2. Restaurant
+3. Park
+
+Vote with: !vote poll_1234567890 <option>
+
+You: !vote poll_1234567890 Coffee Shop
+Bot: ✅ Vote recorded!
+
+You: !pollresults poll_1234567890
+Bot: 📊 Poll Results: Where should we meet?
+
+Coffee Shop: 5 votes (50.0%)
+█████
+
+Restaurant: 3 votes (30.0%)
+███
+
+Park: 2 votes (20.0%)
+██
+
+Total votes: 10
+```
+
+### Reminders
+- `!remind <time> <message>` - Set a reminder (supports: 30s, 5m, 2h, 1d)
+- `!reminders` - List your active reminders
+- `!cancelreminder <id>` - Cancel a reminder
+
+**Example:**
+```
+You: !remind 30m Call the team
+Bot: ⏰ Reminder set! ID: reminder_1234567890
+     I'll remind you in 30m
+
+[30 minutes later]
+Bot: ⏰ Reminder: Call the team
+```
+
+### Group Statistics (Great for Large Groups)
+- `!stats` - View group statistics (message counts, active users, top contributors)
+- `!mystats` - View your personal activity in the group
+
+**Example:**
+```
+You: !stats
+Bot: 📊 Group Statistics
+
+Total messages: 1,234
+Active members today: 45
+Total members: 678
+
+Top contributors:
+1. ****5678: 234 messages (18.9%)
+2. ****9012: 198 messages (16.0%)
+3. ****3456: 156 messages (12.6%)
+...
+```
+
+### Announcements (Pin Important Messages)
+- `!announce <message>` - Pin an important announcement
+- `!announcements` - View all pinned announcements
+
+**Example:**
+```
+You: !announce Meeting moved to 3 PM today
+Bot: 📌 Announcement pinned! ID: announcement_1234567890
+
+You: !announcements
+Bot: 📌 Pinned Announcements:
+
+1. Meeting moved to 3 PM today
+   (by ****5678, 2 hours ago)
+
+2. Welcome to the group! Please introduce yourself.
+   (by ****1234, 1 day ago)
+```
+
+### Mentions (Slack-style)
+- Use `@+1234567890` to mention someone in your message
+- `!mentions` - View your recent mentions
+- `!clearmentions` - Clear your mention notifications
+
+**Example:**
+```
+You: Hey @+1234567890, can you review this?
+[The mentioned user receives a notification]
+
+Mentioned User: !mentions
+Bot: 💬 Your Mentions (1):
+
+1. From ****5678 (5 minutes ago)
+   Hey @+1234567890, can you review this?
+```
+
+### Original Examples
 **Example:**
 ```
 You: !ping
@@ -156,15 +297,24 @@ The bot is configured via environment variables. See `.env.example` for all opti
 
 ```
 signal-bot-playground/
-├── main.go           # Main application entry point
-├── config.go         # Configuration management
-├── handler.go        # Message handling and command logic
-├── go.mod           # Go module definition
-├── .env.example     # Environment variable template
-├── .gitignore       # Git ignore rules
-├── Dockerfile       # Docker image definition
-├── docker-compose.yml # Docker Compose configuration
-└── README.md        # This file
+├── main.go              # Main application entry point
+├── config.go            # Configuration management
+├── handler.go           # Message handling and command routing
+├── polls.go             # Polls and voting system
+├── reminders.go         # Reminder scheduling and delivery
+├── groupstats.go        # Group statistics and analytics
+├── slacklike.go         # Announcements and mentions tracking
+├── go.mod               # Go module definition
+├── go.sum               # Dependency checksums
+├── .env.example         # Environment variable template
+├── .gitignore           # Git ignore rules
+├── Dockerfile           # Docker image definition
+├── docker-compose.yml   # Docker Compose configuration
+├── Makefile             # Build and deployment commands
+├── README.md            # Main documentation
+├── FEATURES.md          # Comprehensive features guide
+├── ARCHITECTURE.md      # Architecture documentation
+└── QUICKSTART.md        # Quick start guide
 ```
 
 ## Adding Custom Commands
